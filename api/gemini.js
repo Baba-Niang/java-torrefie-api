@@ -206,12 +206,20 @@ module.exports = async function handler(req, res) {
     });
 
     if (!geminiResponse.ok) {
-      res.status(502).json({
-        error: "Impossible de contacter Gemini pour le moment. Réessaie dans quelques instants.",
-      });
-      return;
-    }
+  const errorText = await geminiResponse.text();
 
+  console.error("GEMINI API ERROR", {
+    status: geminiResponse.status,
+    body: errorText,
+  });
+
+  res.status(502).json({
+    error: "Diagnostic Gemini",
+    googleStatus: geminiResponse.status,
+    googleError: errorText,
+  });
+  return;
+}
     const data = await geminiResponse.json();
     const reply =
       data &&

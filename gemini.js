@@ -196,19 +196,28 @@ module.exports = async function handler(req, res) {
   };
 
   try {
-    const geminiResponse = await fetch(GEMINI_URL + "?key=" + apiKey, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestPayload),
-    });
+ const geminiResponse = await fetch(GEMINI_URL, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-goog-api-key": apiKey,
+  },
+  body: JSON.stringify(requestPayload),
+});
 
-    if (!geminiResponse.ok) {
-      res.status(502).json({
-        error: "Impossible de contacter Gemini pour le moment. Réessaie dans quelques instants.",
-      });
-      return;
-    }
+if (!geminiResponse.ok) {
+  const errorText = await geminiResponse.text();
 
+  console.error("GEMINI API ERROR", {
+    status: geminiResponse.status,
+    body: errorText,
+  });
+
+  res.status(502).json({
+    error: "Impossible de contacter Gemini pour le moment. Réessaie dans quelques instants.",
+  });
+  return;
+}
     const data = await geminiResponse.json();
     const reply =
       data &&

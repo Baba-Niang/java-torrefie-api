@@ -196,10 +196,13 @@ module.exports = async function handler(req, res) {
   };
 
   try {
-    const geminiResponse = await fetch(GEMINI_URL + "?key=" + apiKey, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestPayload),
+    const geminiResponse = await fetch(GEMINI_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
+    },
+    body: JSON.stringify(requestPayload),
     });
 
     if (!geminiResponse.ok) {
